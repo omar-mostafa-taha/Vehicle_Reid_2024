@@ -7,14 +7,16 @@ from torch import Tensor
 import numpy as np
 import copy
 
-
+# calculates the pairwise squared Euclidean distances between vectors
 def pdist(vectors):
     distance_matrix = -2 * vectors.mm(torch.t(vectors)) + vectors.pow(2).sum(dim=1).view(1, -1) + vectors.pow(2).sum(
         dim=1).view(-1, 1)
     return distance_matrix
-
+    
+# calculates the total number of trainable parameters in a given model.
 def count_parameters(model): return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+# initializes the weights of a neural network model using the Kaiming (He) initialization strategy. 
 def weights_init_kaiming(m):
     classname = m.__class__.__name__
     if classname.find('Linear') != -1:
@@ -29,7 +31,7 @@ def weights_init_kaiming(m):
             nn.init.constant_(m.weight, 1.0)
             nn.init.constant_(m.bias, 0.0)
 
-
+# initialize the weights and biases of fully connected layers
 def weights_init_classifier(m):
     classname = m.__class__.__name__
     if classname.find('Linear') != -1:
@@ -37,7 +39,7 @@ def weights_init_classifier(m):
         if m.bias:
             nn.init.constant_(m.bias, 0.0)
 
-
+# Multihead Attention
 class MHA(nn.Module):
     def __init__(self, n_dims, heads=4):
         super(MHA, self).__init__()
@@ -57,8 +59,10 @@ class MHA(nn.Module):
         return out
 
 
-## Transformer Block
-##multi Head attetnion from BoTnet https://github.com/leaderj1001/BottleneckTransformers/blob/main/model.py
+# Transformer Block
+# multi Head attetnion from BoTnet https://github.com/leaderj1001/BottleneckTransformers/blob/main/model.py
+# Multi-Head Self-Attention (MHSA) mechanism that customizes the self-attention mechanism
+# to account for both content-based and position-based interactions in a multi-head configuration. 
 class MHSA(nn.Module):
     def __init__(self, n_dims, width=16, height=16, heads=4):
         super(MHSA, self).__init__()
@@ -92,8 +96,9 @@ class MHSA(nn.Module):
 
         return out
 
-###also from https://github.com/leaderj1001/BottleneckTransformers/blob/main/model.py
 
+# also from https://github.com/leaderj1001/BottleneckTransformers/blob/main/model.py
+# combines traditional convolutional layers with a multi-head self-attention mechanism (MHSA) and optionally a MLP
 class Bottleneck_Transformer(nn.Module):
     expansion = 4
 
@@ -144,6 +149,8 @@ class Bottleneck_Transformer(nn.Module):
 
 
 # Defines the new fc layer and classification layer
+# This class provides a flexible way to define the final layers of the neural network for classification 
+# supporting various configurations and initialization strategies.
 # |--MLP--|--bn--|--relu--|--Linear--|
 class ClassBlock(nn.Module):
     def __init__(self, input_dim, class_num, droprate=0.0, relu=False, bnorm=True, linear=False, return_f = True, circle=False):
@@ -194,7 +201,7 @@ class ClassBlock(nn.Module):
             x = self.classifier(x)
             return x
 
-
+# this class splits the input channels into groups, applying batch normalization separately to each group.
 class GroupNormwMomentum(nn.Module):
     def __init__(self, n_groups, n_channels):
         super().__init__()
@@ -212,7 +219,9 @@ class GroupNormwMomentum(nn.Module):
         return torch.cat((x_left, x_right), dim=1)
 
 
-
+# defines a neural network module that integrates both convolutional and multi-head self-attention mechanisms.
+# designed to process two separate groups within the input tensor. 
+# This architecture benefit from both local feature extraction (via convolutions) and global dependency modeling (via self-attention).
 class Conv_MHSA_2G(nn.Module):
     def __init__(self, c_in, c_out, resolution=[16,16], heads=4) -> None:
         super().__init__()
@@ -228,6 +237,8 @@ class Conv_MHSA_2G(nn.Module):
 
         return x
 
+# feature extraction by dividing the input into four distinct processing paths,
+# each benefiting from either localized convolutional processing or global self-attention mechanisms. 
 class Conv_MHSA_4G(nn.Module):
     def __init__(self, c_in, c_out, resolution=[16,16], heads=4) -> None:
         super().__init__()
@@ -242,6 +253,8 @@ class Conv_MHSA_4G(nn.Module):
         x = torch.cat((x_12, x_3, x_4), dim=1)
 
         return x
+
+# divides the input into two groups and applying MHSA to each,
 class MHSA_2G(nn.Module):
     def __init__(self, c_out, resolution=[16,16], heads=4) -> None:
         super().__init__()
@@ -257,7 +270,7 @@ class MHSA_2G(nn.Module):
     
 
 
-
+# customization of the backbone model and stride adjustment for each branch
 class base_branches(nn.Module):
     def __init__(self, backbone="ibn", stride=1):
         super(base_branches, self).__init__()
@@ -282,7 +295,8 @@ class base_branches(nn.Module):
     def forward(self, x):
         x = self.model(x)
         return x
-    
+
+
 class multi_branches(nn.Module):
     def __init__(self, n_branches, n_groups, pretrain_ongroups=True, end_bot_g=False, group_conv_mhsa=False, group_conv_mhsa_2=False, x2g = False, x4g=False):
         super(multi_branches, self).__init__()
