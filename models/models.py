@@ -483,7 +483,7 @@ class MBR_model(nn.Module):
 
 
 if __name__ == "__main__":
-    input = torch.randn((32,3,256,256))
+    input = torch.randn((2,3,256,256)) # random input
 
     ### MBR_4B
     model = MBR_model(575, ["R50", "R50", "BoT", "BoT"], n_groups=0, losses ="LBS", LAI=True)
@@ -491,4 +491,18 @@ if __name__ == "__main__":
     print("\nn_preds: ", len(preds))
     print("n_embs: ", len(embs))
     print("ffs: ", len(ffs))
+    print("output: ", len(output))
+
+    # print tensors
+    print("\nn_preds: ", preds)
+    print("n_embs: ", embs)
+    print("ffs: ", ffs)
+    print("output: ", output)
+    # print shape
+    print("\nn_preds: ", preds[0].shape)
+    print("n_embs: ", embs[0].shape)
+    print("ffs: ", ffs[0].shape)
+    print("output: ", output[0].shape)
+
+
 
