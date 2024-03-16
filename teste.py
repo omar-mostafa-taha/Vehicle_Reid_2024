@@ -84,18 +84,26 @@ def test_epoch(model, device, dataloader_q, dataloader_g, model_arch, remove_jun
     # else:
     #     queries_names = np.loadtxt(data['query_list_file'], dtype='str_')
     #     galeria_names = np.loadtxt(data['gallery_list_file'], dtype='str_')
-    ###needed lists
+
+    # to store img embeddings
     qf = []
     gf = []
+
+    # to store camera ids
     q_camids = []
     g_camids = []
+
+    # to store img ids
     q_vids = []
     g_vids = []
+
     q_images = []
     g_images =  []
+
     count_imgs = 0
     blend_ratio =0.3
     with torch.no_grad():
+        # loop over all batches
         for image, q_id, cam_id, view_id  in tqdm(dataloader_q, desc='Query infer (%)', bar_format='{l_bar}{bar:20}{r_bar}'):
             image = image.to(device)
             if scaler:
@@ -107,11 +115,15 @@ def test_epoch(model, device, dataloader_q, dataloader_g, model_arch, remove_jun
             # if not data['dataset'] == "VehicleID":
             #     save_activ(activations, count_imgs, data, re_escala, queries_names, blend_ratio)
                     
-            count_imgs += activations[0].shape[0]
+            count_imgs += activations[0].shape[0] # 2048
             end_vec = []
+
+            # loop over one batch and apply normalization
+            # ffs -> BATCH_SIZE * 2048
             for item in ffs:
                 end_vec.append(F.normalize(item))
-            qf.append(torch.cat(end_vec, 1))
+
+            qf.append(torch.cat(end_vec, 1)) # shape-> num_batches * ffs.shape , ffs.shape -> BATCH_SIZE * 2048
             q_vids.append(q_id)
             q_camids.append(cam_id)
 
@@ -147,7 +159,10 @@ def test_epoch(model, device, dataloader_q, dataloader_g, model_arch, remove_jun
     # with open(args.path_weights +'g_feats.npy', 'wb') as f:
     #     np.save(f, gf.cpu().numpy())
 
+    # get the number of images in query and gallery
     m, n = qf.shape[0], gf.shape[0]   
+
+    # if re_rank = True then re rank the images
     if re_rank:
         distmat = re_ranking(qf, gf, k1=80, k2=16, lambda_value=0.3)
     else:
