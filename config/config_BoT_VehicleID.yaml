@@ -44,10 +44,10 @@ pretrain_ongroups: True
 # 
 ##DATA
 ROOT_DIR: /home/eurico/VehicleID_V1.0/image/
-BATCH_SIZE: 128 
+BATCH_SIZE: 64 
 NUM_INSTANCES: 4 
-num_workers_train: 8 
-num_workers_teste: 16
+num_workers_train: 2 
+num_workers_teste: 2
 
 y_length: 256
 x_length: 256
@@ -82,7 +82,7 @@ momentum: 0.9
 ###scheduler settings
 sched_name: Warm_MultiStep
 min_lr: 7.75e-5
-num_epochs: 130
+#num_epochs: 130
 milestones: [40, 70, 100]
 gamma: 0.1
 warmup_factor: 0.0
