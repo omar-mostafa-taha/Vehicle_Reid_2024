@@ -318,17 +318,8 @@ class EFFicient3b_model(nn.Module):
 
     def forward(self, x,cam, view):
         mix = self.modelup2L3(x)
-        print(mix.shape)
         output = self.modelL4(mix)
         preds, embs, ffs = self.finalblock(output, cam, view)
 
         return preds, embs, ffs, output
 
-input = torch.randn((2,3,256,256))
-
-### MBR_4B
-model = EFFicient3b_model(575, ["R50", "R50", "BoT", "BoT"], n_groups=0, losses ="LBS", LAI=False)
-preds, embs, ffs, output = model(input, torch.randint(0,19,(32,1)), torch.randint(0,7,(32,8)))
-print("\nn_preds: ", len(preds))
-print("n_embs: ", len(embs))
-print("ffs: ", len(ffs))
