@@ -124,9 +124,9 @@ if __name__ == "__main__":
 
     #### Dataset Loading       
     if data['dataset']== "VehicleID":
-        data_q = CustomDataSet4VehicleID('/home/eurico/VehicleID_V1.0/train_test_split/test_list_800.txt', data['ROOT_DIR'], is_train=False, mode="q", transform=teste_transform)
-        data_g = CustomDataSet4VehicleID('/home/eurico/VehicleID_V1.0/train_test_split/test_list_800.txt', data['ROOT_DIR'], is_train=False, mode="g", transform=teste_transform)
-        data_train = CustomDataSet4VehicleID("/home/eurico/VehicleID_V1.0/train_test_split/train_list.txt", data['ROOT_DIR'], is_train=True, transform=train_transform)
+        data_q = CustomDataSet4VehicleID('/content/drive/MyDrive/VehicleID/train_test_split/test_list_800.txt', "/content/drive/MyDrive/VehicleID/images", is_train=False, mode="q", transform=teste_transform)
+        data_g = CustomDataSet4VehicleID('/content/drive/MyDrive/VehicleID/train_test_split/test_list_800.txt', "/content/drive/MyDrive/VehicleID/images", is_train=False, mode="g", transform=teste_transform)
+        data_train = CustomDataSet4VehicleID("/content/drive/MyDrive/VehicleID/train_test_split/train_list.txt", "/content/drive/MyDrive/VehicleID/images", is_train=True, transform=train_transform)
         data_train = DataLoader(data_train, sampler=RandomIdentitySampler(data_train, data['BATCH_SIZE'], data['NUM_INSTANCES']), num_workers=data['num_workers_train'], batch_size = data['BATCH_SIZE'], collate_fn=train_collate_fn, pin_memory=True)#
         data_q = DataLoader(data_q, batch_size=data['BATCH_SIZE'], shuffle=False, num_workers=data['num_workers_teste'])
         data_g = DataLoader(data_g, batch_size=data['BATCH_SIZE'], shuffle=False, num_workers=data['num_workers_teste'])
@@ -244,7 +244,10 @@ if __name__ == "__main__":
             cmc, mAP = test_epoch(model, device, data_q, data_g, data['model_arch'], logger, epoch, remove_junk=True, scaler=scaler)
             print('\n EPOCH {}/{} \t train loss {} \t Classification loss {} \t Triplet loss {} \t mAP {} \t CMC1 {} \t CMC5 {}'.format(epoch + 1, data['num_epochs'], train_loss, c_loss, t_loss,mAP, cmc[0], cmc[4]))
             logger.save_model(model)
-
+            
+    torch.save(obj=model.state_dict(), # only saving the state_dict() only saves the learned parameters
+           f="/content/drive/MyDrive/saved model/version1.pth")
+    
     print("Best mAP: ", np.max(logger.logscalars['Accuraccy/mAP']))
     print("Best CMC1: ", np.max(logger.logscalars['Accuraccy/CMC1']))
     logger.save_log()   
