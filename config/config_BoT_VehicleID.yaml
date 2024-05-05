@@ -9,7 +9,7 @@ freeze_triplet_branches: 0
 freeze_backbone_warmup: False 
 branch_layer: 3
 validation_period: 10
-
+num_epochs : 10
 ###GPU Settings
 half_precision: True 
 parallel: False
