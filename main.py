@@ -70,6 +70,7 @@ if __name__ == "__main__":
             data = yaml.safe_load(stream)
 
     data['BATCH_SIZE'] = args.batch_size or data['BATCH_SIZE']
+    data['num_epochs'] = data['num_epochs']
     data['p_hflip'] = args.hflip or data['p_hflip']
     data['y_length'] = args.imgsize_y or data['y_length']
     data['x_length'] = args.imgsize_x or data['x_length']
