@@ -5,6 +5,7 @@ from models.models import MBR_model
 from tqdm import tqdm
 import numpy as np
 from metrics.eval_reid import eval_func
+from Efficient3b import EFFicient3b_model
 
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
@@ -37,6 +38,9 @@ def get_model(data, device):
     ### MBR-4B (4B hybrid LBS)
     if data['model_arch'] == 'MBR_4B':
         model = MBR_model(class_num=data['n_classes'], n_branches=["R50", "R50", "BoT", "BoT"], losses="LBS", n_groups=0, LAI=data['LAI'], n_cams=data['n_cams'], n_views=data['n_views'])
+
+    if data['model_arch'] == 'EFF':
+        model = EFFicient3b_model(class_num=data['n_classes'], n_branches=["R50", "R50", "BoT", "BoT"], losses="LBS", n_groups=0, LAI=data['LAI'], n_cams=data['n_cams'], n_views=data['n_views'])
     
     ### 4B hybdrid No LBS
     if data['model_arch'] == 'Hybrid_4B':
