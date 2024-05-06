@@ -125,9 +125,9 @@ if __name__ == "__main__":
 
     #### Dataset Loading       
     if data['dataset']== "VehicleID":
-        data_q = CustomDataSet4VehicleID('train_test_split/test_list_800.txt', "images/", is_train=False, mode="q", transform=teste_transform)
-        data_g = CustomDataSet4VehicleID('train_test_split/test_list_800.txt', "images/", is_train=False, mode="g", transform=teste_transform)
-        data_train = CustomDataSet4VehicleID("train_test_split/train_list.txt", "images/", is_train=True, transform=train_transform)
+        data_q = CustomDataSet4VehicleID('train_test_split/test_list_800.txt', "images", is_train=False, mode="q", transform=teste_transform)
+        data_g = CustomDataSet4VehicleID('train_test_split/test_list_800.txt', "images", is_train=False, mode="g", transform=teste_transform)
+        data_train = CustomDataSet4VehicleID("train_test_split/train_list.txt", "images", is_train=True, transform=train_transform)
         data_train = DataLoader(data_train, sampler=RandomIdentitySampler(data_train, data['BATCH_SIZE'], data['NUM_INSTANCES']), num_workers=data['num_workers_train'], batch_size = data['BATCH_SIZE'], collate_fn=train_collate_fn, pin_memory=True)#
         data_q = DataLoader(data_q, batch_size=data['BATCH_SIZE'], shuffle=False, num_workers=data['num_workers_teste'])
         data_g = DataLoader(data_g, batch_size=data['BATCH_SIZE'], shuffle=False, num_workers=data['num_workers_teste'])
